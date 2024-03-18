@@ -83,7 +83,7 @@ class Api:
             print(
                 f"Wind:              {self.response['current']['wind_kph']}Km/h {self.response['current']['wind_dir']}"
             )
-            print(f"UV Index:          {util.get_uv_index_rate(self.response['current']['uv'])}")
+            print(f"UV Index:          {util.get_uv_index_rate(self.response['current']['uv'])} ({self.response['current']['uv']})")
             print("-"*70)
 
 
@@ -92,8 +92,9 @@ class Api:
         if commands["json"]:
             print(self.response)
         else:
-            year, month, day = fore_day['date'].split('-')[2]
+            year, month, day = fore_day['date'].split('-')
             location_date = f"( {self.response['location']['name']}, {util.get_day(fore_day['date'])}, {day} {util.get_month(fore_day['date'])} {year} )".center(70, '-')
+            print(location_date)
             print(f"Condition:         {fore_day['day']['condition']['text']}")
             print(
                 f"Temperature:       {fore_day['day']['mintemp_c']}°C/{fore_day['day']['maxtemp_c']}°C"
@@ -102,7 +103,7 @@ class Api:
             print(f"Chance of rain:    {fore_day['day']['daily_chance_of_rain']}%")
             print(f"Chance of snow:    {fore_day['day']['daily_chance_of_snow']}%")
             print(f"Wind:              {fore_day['day']['maxwind_kph']}Km/h")
-            print(f"UV Index:          {util.get_uv_index_rate(fore_day['day']['uv'])}")
+            print(f"UV Index:          {util.get_uv_index_rate(fore_day['day']['uv'])} ({fore_day['day']['uv']})")
             # print("_________________________________________________________________")
             print("-"*70)
             if commands["all"]:
