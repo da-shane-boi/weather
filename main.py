@@ -1,8 +1,10 @@
+#! /usr/bin/python3
 import argparse
 from api import Api
+import sys
+from handler import *
 
-
-def create_parser():
+def create_parser(sys_args):
     parser = argparse.ArgumentParser(
         prog="Weather App", description="A CLI weather application"
     )
@@ -44,25 +46,37 @@ def create_parser():
         help="See all data for forecast"
     )
 
-    return parser
+    parser.add_argument(
+        #TODO
+        "-H",
+        "--hour",
+        metavar="military hour",
+        type=int,
+        help="Get the weather for an exact hour, eg; 16 -> 4pm"
+    )
+
+    parser.add_argument(
+        #TODO
+        '-b',
+        '--breakdown',
+        action="store_true",
+        help="Get an hourly breakdown of the day."
+    )
+
+    return parser.parse_args(sys_args)
 
 
 if __name__ == "__main__":
 
-    parser = create_parser()
-    args = parser.parse_args()
+    args = create_parser(sys.argv[1:])
     api = Api()
-    json = True if args.get_json else False
-    all = True if args.all else False
-    if args.forecast:
-        params = {"key": api.KEY, "q": args.location, "days": args.forecast}
-        api.get("forecast", params)
-        api.print_response_forecast(json, all)
-    elif args.tomorrow:
-        params = {"key": api.KEY, "q": args.location, "days": 2}
-        api.get("forecast", params)
-        api.print_response_forecast(json, all)
-    else:
-        params = {"key": api.KEY, "q": args.location}
-        api.get("current", params)
-        api.print_response_current(json)
+    try:
+        param_args = generate_command_paramaters(args)
+    except UserWarning:
+        print("[Error] Cannot call --hour and --breakdown at the same time.")
+        sys.exit()
+    except SyntaxError:
+        print("[Error] Hour must be called using military time, eg; 0 -> 12 am, 12 -> 12pm, 23 -> 11pm")
+        sys.exit()
+    handle_commands(api, param_args)
+

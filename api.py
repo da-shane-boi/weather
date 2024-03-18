@@ -5,10 +5,12 @@ import util
 
 
 class Api:
-    def __init__(self) -> None:
+    def __init__(self, is_test=False) -> None:
         self.base_url = "https://api.weatherapi.com/v1"
         self.path = Path.home() / ".config" / "weather"
-        self.KEY = self.configure()
+        self.test=is_test
+        if not is_test:
+            self.KEY = self.configure()
 
         self.response = None
 
@@ -55,17 +57,22 @@ class Api:
         return str(response.status_code)[0] != "4"
 
     def get(self, type: str, paramaters: dict):
-        self.response = requests.get(
-            f"{self.base_url}/{type}.json", params=paramaters
-        ).json()
+        if not self.test:
+            self.response = requests.get(
+                f"{self.base_url}/{type}.json", params=paramaters
+            ).json()
 
-    def print_response_current(self, json:bool):
-        if json:
+    def print_response_current(self, commands:dict):
+        if commands["json"]:
             print(self.response)
         else:
-            print("_________________________________________________________________")
-            print()
-            print(f"Location:          {self.response['location']['name']}")
+            # print("_________________________________________________________________")
+            # print()
+            date, time = self.response['location']['localtime'].split(" ")
+            year, month, day = date.split("-")
+            location_date = f"( {self.response['location']['name']}, {util.get_day(date)}, {day} {util.get_month(date)} {year} )".center(70, '-')
+            print(location_date)
+            # print(f"Location:          {self.response['location']['name']}")
             print(f"Condition:         {self.response['current']['condition']['text']}")
             print(f"Temperature:       {self.response['current']['temp_c']}°C")
             if self.response['current']['temp_c'] != self.response['current']["feelslike_c"]:
@@ -74,22 +81,19 @@ class Api:
             if self.response["current"]["precip_mm"] > 0.1:
                 print(f"Rain:              {self.response['current']['precip_mm']}mm")
             print(
-                f"Wind:              {self.response['current']['wind_kph']}Km {self.response['current']['wind_dir']}"
+                f"Wind:              {self.response['current']['wind_kph']}Km/h {self.response['current']['wind_dir']}"
             )
             print(f"UV Index:          {util.get_uv_index_rate(self.response['current']['uv'])}")
-            print("_________________________________________________________________")
+            print("-"*70)
 
-    def print_response_forecast(self, json:bool, all:bool):
+
+    def print_response_forecast(self, commands):
         fore_day = self.response["forecast"]["forecastday"][-1]
-        if json:
+        if commands["json"]:
             print(self.response)
         else:
-            print("_________________________________________________________________")
-            print()
-            print(f"Location:          {self.response['location']['name']}")
-            print(
-                f"Date:              {util.get_day(fore_day['date'])}, {fore_day['date'].split('-')[2]} {util.get_month(fore_day['date'])}"
-            )
+            year, month, day = fore_day['date'].split('-')[2]
+            location_date = f"( {self.response['location']['name']}, {util.get_day(fore_day['date'])}, {day} {util.get_month(fore_day['date'])} {year} )".center(70, '-')
             print(f"Condition:         {fore_day['day']['condition']['text']}")
             print(
                 f"Temperature:       {fore_day['day']['mintemp_c']}°C/{fore_day['day']['maxtemp_c']}°C"
@@ -97,10 +101,11 @@ class Api:
             print(f"Humidity:          {fore_day['day']['avghumidity']}%")
             print(f"Chance of rain:    {fore_day['day']['daily_chance_of_rain']}%")
             print(f"Chance of snow:    {fore_day['day']['daily_chance_of_snow']}%")
-            print(f"Wind:              {fore_day['day']['maxwind_kph']}Km")
+            print(f"Wind:              {fore_day['day']['maxwind_kph']}Km/h")
             print(f"UV Index:          {util.get_uv_index_rate(fore_day['day']['uv'])}")
-            print("_________________________________________________________________")
-            if all:
+            # print("_________________________________________________________________")
+            print("-"*70)
+            if commands["all"]:
                 print()
                 print(f"Sunrise:           {fore_day['astro']['sunrise']}")
                 print(f"Sunset:            {fore_day['astro']['sunset']}")
@@ -108,7 +113,22 @@ class Api:
                 print(f"Moonset:           {fore_day['astro']['moonset']}")
                 print(f"Moon Phase:        {fore_day['astro']['moon_phase']}")
                 print(f"Moon Light:        {fore_day['astro']['moon_illumination']}")
-                print("_________________________________________________________________")
+                print("-"*70)
+                # print("_________________________________________________________________")
 
+    def print_hour(self, commands):
 
-            
+        hour_dict = self.response["forecast"]["forecastday"][-1]["hour"][commands["hour_value"]]
+        date, time = hour_dict['time'].split(' ')
+        year, month, day = date.split("-")
+        location_date = f"( {self.response['location']['name']}, {util.get_day(date)}, {time}, {day} {util.get_month(date)} {year} )".center(70, "-")
+
+        print(location_date)
+        print(f"Condition:         {hour_dict['condition']['text']}")
+        print(f"Temperature:       {hour_dict['temp_c']}°C")
+        print(f"Wind:              {hour_dict['wind_kph']}Km/h {hour_dict['wind_dir']}")
+        print(f"Humidity:          {hour_dict['humidity']}%")
+        print(f"Chance of Rain:    {hour_dict['chance_of_rain']}%")
+        print(f"Chance of Snow:    {hour_dict['chance_of_snow']}%")
+        print(f"UV Index:          {util.get_uv_index_rate(hour_dict['uv'])} ({hour_dict['uv']})")
+        print('-'*70)
