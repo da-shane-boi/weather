@@ -1,5 +1,6 @@
 from datetime import datetime
 import calendar
+from colour import Colour as col
 
 def get_day(given_date: str) -> str:
     """Get the day of the week from a given date
@@ -41,16 +42,21 @@ def get_month(given_date:str) -> str:
     return months[given_datetime.month]
 
 def get_uv_index_rate(index:float):
+    colour = col()
     if 0 < index < 3:
         return "Low"
     elif 2 < index < 6:
-        return "Moderate"
+        # return f"{col.GREEN}Moderate{col.WHITE}"
+        return colour.string("Moderate", 'green')
     elif 5 < index < 8:
-        return "High"
+        # return f"{col.YELLOW}High{col.WHITE}"
+        return colour.string("High", 'yellow')
     elif 7 < index < 11:
-        return "Very High"
+        # return f"{col.RED}Very High{col.WHITE}"
+        return colour.string("Very High", 'red')
     elif index > 10: 
-        return "Extreme"
+        # return f"{col.BOLDON}{col.RED}Extreme{col.WHITE}"
+        return colour.string("Extreme", 'red', bold=True)
 
 if __name__ == "__main__":
     print(get_month("2024-11-15"))

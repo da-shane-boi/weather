@@ -42,37 +42,37 @@ class TestUtil(unittest.TestCase):
 
     def test_uv_index_low(self):
         index = util.get_uv_index_rate(1.0)
-        self.assertEqual("Low", index)
+        self.assertTrue("Low" in index)
         index = util.get_uv_index_rate(2.0)
-        self.assertEqual("Low", index)
+        self.assertTrue("Low" in index)
 
     def test_uv_index_moderate(self):
         index = util.get_uv_index_rate(3.0)
-        self.assertEqual("Moderate", index)
+        self.assertTrue("Moderate" in index)
         index = util.get_uv_index_rate(4.0)
-        self.assertEqual("Moderate", index)
+        self.assertTrue("Moderate" in index)
         index = util.get_uv_index_rate(5.0)
-        self.assertEqual("Moderate", index)
+        self.assertTrue("Moderate" in index)
         
     def test_uv_index_high(self):
         index = util.get_uv_index_rate(6.0)
-        self.assertEqual("High", index)
+        self.assertTrue("High" in index)
         index = util.get_uv_index_rate(7.0)
-        self.assertEqual("High", index)
+        self.assertTrue("High" in index)
         
     def test_get_uv_index_very_high(self):
         index = util.get_uv_index_rate(8.0)
-        self.assertEqual("Very High", index)
+        self.assertTrue("Very High" in index)
         index = util.get_uv_index_rate(9.0)
-        self.assertEqual("Very High", index)
+        self.assertTrue("Very High" in index)
         index = util.get_uv_index_rate(10.0)
-        self.assertEqual("Very High", index)
+        self.assertTrue("Very High" in index)
         
 
     def test_uv_index_extreme(self):
         index = util.get_uv_index_rate(11.0)
-        self.assertEqual("Extreme", index)
+        self.assertTrue("Extreme" in index)
         index = util.get_uv_index_rate(12.0)
-        self.assertEqual("Extreme", index)
+        self.assertTrue("Extreme" in index)
         
         

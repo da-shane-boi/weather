@@ -66,13 +66,10 @@ class Api:
         if commands["json"]:
             print(self.response)
         else:
-            # print("_________________________________________________________________")
-            # print()
             date, time = self.response['location']['localtime'].split(" ")
             year, month, day = date.split("-")
             location_date = f"( {self.response['location']['name']}, {util.get_day(date)}, {day} {util.get_month(date)} {year} )".center(70, '-')
             print(location_date)
-            # print(f"Location:          {self.response['location']['name']}")
             print(f"Condition:         {self.response['current']['condition']['text']}")
             print(f"Temperature:       {self.response['current']['temp_c']}°C")
             if self.response['current']['temp_c'] != self.response['current']["feelslike_c"]:
@@ -104,7 +101,6 @@ class Api:
             print(f"Chance of snow:    {fore_day['day']['daily_chance_of_snow']}%")
             print(f"Wind:              {fore_day['day']['maxwind_kph']}Km/h")
             print(f"UV Index:          {util.get_uv_index_rate(fore_day['day']['uv'])} ({fore_day['day']['uv']})")
-            # print("_________________________________________________________________")
             print("-"*70)
             if commands["all"]:
                 print()
@@ -115,7 +111,6 @@ class Api:
                 print(f"Moon Phase:        {fore_day['astro']['moon_phase']}")
                 print(f"Moon Light:        {fore_day['astro']['moon_illumination']}")
                 print("-"*70)
-                # print("_________________________________________________________________")
 
     def print_hour(self, commands):
 
