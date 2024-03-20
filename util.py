@@ -58,5 +58,38 @@ def get_uv_index_rate(index:float):
         # return f"{col.BOLDON}{col.RED}Extreme{col.WHITE}"
         return colour.string("Extreme", 'red', bold=True)
 
+def get_heading(location:str, date:str, time="", center=True, heading_colour='cyan'):
+    colour = col()
+    year, month, day = date.split('-')
+    heading = ""
+
+    heading += f"{location}, "
+    heading += f"{get_day(date)}, "
+    if time:
+        heading += f"{time}, "
+    heading += f"{day} "
+    heading += f"{get_month(date)} "
+    heading += f"{year}"
+    if center:
+        heading = heading.center(70, ' ' )
+    heading = colour.string(heading, heading_colour, bold=True)
+    return heading
+
+def get_break():
+    breakline = "-" * 70
+    colour = col()
+    return colour.string(breakline, 'green', bold=True)
+
+def colour_temp(temp):
+    colour = col()
+    if 16 > temp:
+        return colour.string(str(temp), 'blue')
+    elif 15 < temp < 19:
+        return colour.string(str(temp), 'green')
+    elif 20 < temp < 27 :
+        return colour.string(str(temp), 'yellow')
+    elif 26 < temp:
+        return colour.string(str(temp), 'red')
+
 if __name__ == "__main__":
     print(get_month("2024-11-15"))

@@ -2,13 +2,15 @@ from pathlib import Path
 import requests
 import os
 import util
+from prettytable import PrettyTable as Pt
+from colour import Colour as c
 
 
 class Api:
     def __init__(self, is_test=False) -> None:
         self.base_url = "https://api.weatherapi.com/v1"
         self.path = Path.home() / ".config" / "weather"
-        self.test=is_test
+        self.test = is_test
         if not is_test:
             self.KEY = self.configure()
 
@@ -62,17 +64,22 @@ class Api:
                 f"{self.base_url}/{type}.json", params=paramaters
             ).json()
 
-    def print_response_current(self, commands:dict):
+    def print_response_current(self, commands: dict):
         if commands["json"]:
             print(self.response)
         else:
-            date, time = self.response['location']['localtime'].split(" ")
-            year, month, day = date.split("-")
-            location_date = f"( {self.response['location']['name']}, {util.get_day(date)}, {day} {util.get_month(date)} {year} )".center(70, '-')
+            date, time = self.response["location"]["localtime"].split(" ")
+            location_date = util.get_heading(self.response["location"]["name"], date)
+            # print()
+            print()
             print(location_date)
+            print()
             print(f"Condition:         {self.response['current']['condition']['text']}")
             print(f"Temperature:       {self.response['current']['temp_c']}°C")
-            if self.response['current']['temp_c'] != self.response['current']["feelslike_c"]:
+            if (
+                self.response["current"]["temp_c"]
+                != self.response["current"]["feelslike_c"]
+            ):
                 print(f"    Feels like:    {self.response['current']['feelslike_c']}°C")
             print(f"Humidity:          {self.response['current']['humidity']}%")
             if self.response["current"]["precip_mm"] > 0.1:
@@ -80,18 +87,25 @@ class Api:
             print(
                 f"Wind:              {self.response['current']['wind_kph']}Km/h {self.response['current']['wind_dir']}"
             )
-            print(f"UV Index:          {util.get_uv_index_rate(self.response['current']['uv'])} ({self.response['current']['uv']})")
-            print("-"*70)
-
+            print(
+                f"UV Index:          {util.get_uv_index_rate(self.response['current']['uv'])} ({self.response['current']['uv']})"
+            )
+            print()
+            # print()
+            # print(util.get_break())
 
     def print_response_forecast(self, commands):
         fore_day = self.response["forecast"]["forecastday"][-1]
         if commands["json"]:
             print(self.response)
         else:
-            year, month, day = fore_day['date'].split('-')
-            location_date = f"( {self.response['location']['name']}, {util.get_day(fore_day['date'])}, {day} {util.get_month(fore_day['date'])} {year} )".center(70, '-')
+            location_date = util.get_heading(
+                self.response["location"]["name"], fore_day["date"]
+            )
+            # print()
+            print()
             print(location_date)
+            print()
             print(f"Condition:         {fore_day['day']['condition']['text']}")
             print(
                 f"Temperature:       {fore_day['day']['mintemp_c']}°C/{fore_day['day']['maxtemp_c']}°C"
@@ -100,31 +114,74 @@ class Api:
             print(f"Chance of rain:    {fore_day['day']['daily_chance_of_rain']}%")
             print(f"Chance of snow:    {fore_day['day']['daily_chance_of_snow']}%")
             print(f"Wind:              {fore_day['day']['maxwind_kph']}Km/h")
-            print(f"UV Index:          {util.get_uv_index_rate(fore_day['day']['uv'])} ({fore_day['day']['uv']})")
-            print("-"*70)
+            print(
+                f"UV Index:          {util.get_uv_index_rate(fore_day['day']['uv'])} ({fore_day['day']['uv']})"
+            )
+            # print(util.get_break())
+            print()
             if commands["all"]:
-                print()
                 print(f"Sunrise:           {fore_day['astro']['sunrise']}")
                 print(f"Sunset:            {fore_day['astro']['sunset']}")
                 print(f"Moonrise:          {fore_day['astro']['moonrise']}")
                 print(f"Moonset:           {fore_day['astro']['moonset']}")
                 print(f"Moon Phase:        {fore_day['astro']['moon_phase']}")
                 print(f"Moon Light:        {fore_day['astro']['moon_illumination']}")
-                print("-"*70)
+                # print(util.get_break())
+                print()
 
     def print_hour(self, commands):
 
-        hour_dict = self.response["forecast"]["forecastday"][-1]["hour"][commands["hour_value"]]
-        date, time = hour_dict['time'].split(' ')
-        year, month, day = date.split("-")
-        location_date = f"( {self.response['location']['name']}, {util.get_day(date)}, {time}, {day} {util.get_month(date)} {year} )".center(70, "-")
-
+        hour_dict = self.response["forecast"]["forecastday"][-1]["hour"][
+            commands["hour_value"]
+        ]
+        date, time = hour_dict["time"].split(" ")
+        location_date = util.get_heading(self.response["location"]["name"], date, time)
+        print()
         print(location_date)
+        print()
         print(f"Condition:         {hour_dict['condition']['text']}")
         print(f"Temperature:       {hour_dict['temp_c']}°C")
         print(f"Wind:              {hour_dict['wind_kph']}Km/h {hour_dict['wind_dir']}")
         print(f"Humidity:          {hour_dict['humidity']}%")
         print(f"Chance of Rain:    {hour_dict['chance_of_rain']}%")
         print(f"Chance of Snow:    {hour_dict['chance_of_snow']}%")
-        print(f"UV Index:          {util.get_uv_index_rate(hour_dict['uv'])} ({hour_dict['uv']})")
-        print('-'*70)
+        print(
+            f"UV Index:          {util.get_uv_index_rate(hour_dict['uv'])} ({hour_dict['uv']})"
+        )
+        print()
+        # print(util.get_break())
+
+    def print_breakdown(self, commands):
+
+        table = Pt()
+        table.add_column(
+            "Time",
+            [
+                "Condition",
+                "Temperature",
+                "Wind",
+                "UV Index",
+                "HUmidity",
+                "Chance of Rain",
+                "Chance of Snow",
+            ],
+        )
+        hours = [x for x in self.response["forecast"]["forecastday"][-1]["hour"] if 6 < int(x["time"].split(" ")[1].split(":")[0]) < 19]
+        for hour in hours:
+            table.add_column(
+                hour["time"].split(" ")[1].split(":")[0],
+                [
+                    hour["condition"]["text"],
+                    util.colour_temp(hour["temp_c"]),
+                    hour["wind_kph"],
+                    util.get_uv_index_rate(hour["uv"]),
+                    hour["humidity"],
+                    hour["chance_of_rain"],
+                    hour["chance_of_snow"],
+                ],
+            )
+
+        heading = util.get_heading(self.response['location']['name'], hour['time'].split(' ')[0], center=False, heading_colour='purple')
+        heading += "\n"
+        heading += table.get_string()
+        print(heading)

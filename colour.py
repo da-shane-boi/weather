@@ -42,7 +42,7 @@ class Colour():
             case "white":
                 return self.WHITE
             case _:
-                return None
+                return self.WHITE
 
     def col_print(self, text:str, colour:str, bold=False, italics=False, underline=False, reset=True):
         c_start = ""
@@ -58,8 +58,7 @@ class Colour():
             c_end += self.UNDEROFF
         if reset:
             c_end += self.RESET
-        text_col = self.get_colour(colour.lower())
-        c_start += text_col if text_col != None else self.WHITE
+        c_start += self.get_colour(colour.lower())
 
         print(f"{c_start}{text}{c_end}")
     

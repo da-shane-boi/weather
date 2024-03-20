@@ -47,7 +47,6 @@ def create_parser(sys_args):
     )
 
     parser.add_argument(
-        #TODO
         "-H",
         "--hour",
         metavar="military hour",
