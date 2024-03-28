@@ -1,4 +1,6 @@
 from api import Api
+import package
+
 
 def generate_command_paramaters(args):
     if args.breakdown and args.hour:
@@ -16,12 +18,18 @@ def generate_command_paramaters(args):
         validate_hour(args.hour)
         params["hour_value"] = args.hour
     params["breakdown"] = True if args.breakdown else False
+    params["install"] = True if args.install else False
+    params["uninstall"] = True if args.uninstall else False
 
     return params
 
 
 def handle_commands(api: Api, c_params: dict):
-    if c_params["forecast"]:
+    if c_params["install"]:
+        package.install()
+    elif c_params["uninstall"]:
+        package.uninstall()
+    elif c_params["forecast"]:
         params = {
             "key": api.KEY,
             "q": c_params["location"],
@@ -30,7 +38,7 @@ def handle_commands(api: Api, c_params: dict):
         api.get("forecast", params)
         if c_params["hour"]:
             api.print_hour(c_params)
-        elif c_params['breakdown']:
+        elif c_params["breakdown"]:
             api.print_breakdown(c_params)
         else:
             api.print_response_forecast(c_params)
@@ -40,19 +48,19 @@ def handle_commands(api: Api, c_params: dict):
 
         if c_params["hour"]:
             api.print_hour(c_params)
-        elif c_params['breakdown']:
+        elif c_params["breakdown"]:
             api.print_breakdown(c_params)
         else:
             api.print_response_forecast(c_params)
     else:
         params = {"key": api.KEY, "q": c_params["location"]}
-        if c_params["all"] or c_params["hour"] or c_params['breakdown']:
+        if c_params["all"] or c_params["hour"] or c_params["breakdown"]:
             # Get all data for current day
             params["days"] = 1
             api.get("forecast", params)
             if c_params["hour"]:
                 api.print_hour(c_params)
-            elif c_params['breakdown']:
+            elif c_params["breakdown"]:
                 api.print_breakdown(c_params)
             else:
                 api.print_response_forecast(c_params)

@@ -1,8 +1,4 @@
 #! /usr/bin/python3
-import argparse
-from api import Api
-import sys
-from handler import *
 
 def create_parser(sys_args):
     parser = argparse.ArgumentParser(
@@ -62,10 +58,28 @@ def create_parser(sys_args):
         help="Get an hourly breakdown of the day."
     )
 
+    parser.add_argument(
+        "-I",
+        "--install",
+        action="store_true",
+        help="Install script as a binary to path"
+    )
+
+    parser.add_argument(
+        "-U",
+        "--uninstall",
+        action="store_true",
+        help="Uninstall script and remove data."
+    )
+
     return parser.parse_args(sys_args)
 
 
 if __name__ == "__main__":
+    import argparse
+    from api import Api
+    import sys
+    from handler import handle_commands, generate_command_paramaters
 
     args = create_parser(sys.argv[1:])
     api = Api()

@@ -44,18 +44,14 @@ def get_month(given_date:str) -> str:
 def get_uv_index_rate(index:float):
     colour = col()
     if 0 < index < 3:
-        return "Low"
+        return colour.string("Low", "blue")
     elif 2 < index < 6:
-        # return f"{col.GREEN}Moderate{col.WHITE}"
         return colour.string("Moderate", 'green')
     elif 5 < index < 8:
-        # return f"{col.YELLOW}High{col.WHITE}"
         return colour.string("High", 'yellow')
     elif 7 < index < 11:
-        # return f"{col.RED}Very High{col.WHITE}"
         return colour.string("Very High", 'red')
     elif index > 10: 
-        # return f"{col.BOLDON}{col.RED}Extreme{col.WHITE}"
         return colour.string("Extreme", 'red', bold=True)
 
 def get_heading(location:str, date:str, time="", center=True, heading_colour='cyan'):
@@ -84,9 +80,9 @@ def colour_temp(temp):
     colour = col()
     if 16 > temp:
         return colour.string(str(temp), 'blue')
-    elif 15 < temp < 19:
+    elif 15 < temp < 20:
         return colour.string(str(temp), 'green')
-    elif 20 < temp < 27 :
+    elif 19 < temp < 27 :
         return colour.string(str(temp), 'yellow')
     elif 26 < temp:
         return colour.string(str(temp), 'red')

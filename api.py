@@ -2,8 +2,7 @@ from pathlib import Path
 import requests
 import os
 import util
-from prettytable import PrettyTable as Pt
-from colour import Colour as c
+import webbrowser
 
 
 class Api:
@@ -49,6 +48,7 @@ class Api:
 
     def get_key(self) -> str:
         while True:
+            webbrowser.open("https://www.weatherapi.com/my/")
             key = input("Input your Api Key: ")
             if self.validate_key(key):
                 return key
@@ -75,7 +75,9 @@ class Api:
             print(location_date)
             print()
             print(f"Condition:         {self.response['current']['condition']['text']}")
-            print(f"Temperature:       {self.response['current']['temp_c']}°C")
+            print(
+                f"Temperature:       {util.colour_temp(self.response['current']['temp_c'])}°C"
+            )
             if (
                 self.response["current"]["temp_c"]
                 != self.response["current"]["feelslike_c"]
@@ -108,7 +110,7 @@ class Api:
             print()
             print(f"Condition:         {fore_day['day']['condition']['text']}")
             print(
-                f"Temperature:       {fore_day['day']['mintemp_c']}°C/{fore_day['day']['maxtemp_c']}°C"
+                f"Temperature:       {util.colour_temp(fore_day['day']['mintemp_c'])}°C/{util.colour_temp(fore_day['day']['maxtemp_c'])}°C"
             )
             print(f"Humidity:          {fore_day['day']['avghumidity']}%")
             print(f"Chance of rain:    {fore_day['day']['daily_chance_of_rain']}%")
@@ -117,7 +119,6 @@ class Api:
             print(
                 f"UV Index:          {util.get_uv_index_rate(fore_day['day']['uv'])} ({fore_day['day']['uv']})"
             )
-            # print(util.get_break())
             print()
             if commands["all"]:
                 print(f"Sunrise:           {fore_day['astro']['sunrise']}")
@@ -126,7 +127,6 @@ class Api:
                 print(f"Moonset:           {fore_day['astro']['moonset']}")
                 print(f"Moon Phase:        {fore_day['astro']['moon_phase']}")
                 print(f"Moon Light:        {fore_day['astro']['moon_illumination']}")
-                # print(util.get_break())
                 print()
 
     def print_hour(self, commands):
@@ -140,7 +140,7 @@ class Api:
         print(location_date)
         print()
         print(f"Condition:         {hour_dict['condition']['text']}")
-        print(f"Temperature:       {hour_dict['temp_c']}°C")
+        print(f"Temperature:       {util.colour_temp(hour_dict['temp_c'])}°C")
         print(f"Wind:              {hour_dict['wind_kph']}Km/h {hour_dict['wind_dir']}")
         print(f"Humidity:          {hour_dict['humidity']}%")
         print(f"Chance of Rain:    {hour_dict['chance_of_rain']}%")
@@ -149,9 +149,10 @@ class Api:
             f"UV Index:          {util.get_uv_index_rate(hour_dict['uv'])} ({hour_dict['uv']})"
         )
         print()
-        # print(util.get_break())
 
     def print_breakdown(self, commands):
+
+        from prettytable import PrettyTable as Pt
 
         table = Pt()
         table.add_column(
@@ -166,7 +167,11 @@ class Api:
                 "Chance of Snow",
             ],
         )
-        hours = [x for x in self.response["forecast"]["forecastday"][-1]["hour"] if 6 < int(x["time"].split(" ")[1].split(":")[0]) < 19]
+        hours = [
+            x
+            for x in self.response["forecast"]["forecastday"][-1]["hour"]
+            if 6 < int(x["time"].split(" ")[1].split(":")[0]) < 19
+        ]
         for hour in hours:
             table.add_column(
                 hour["time"].split(" ")[1].split(":")[0],
@@ -181,7 +186,12 @@ class Api:
                 ],
             )
 
-        heading = util.get_heading(self.response['location']['name'], hour['time'].split(' ')[0], center=False, heading_colour='purple')
+        heading = util.get_heading(
+            self.response["location"]["name"],
+            hour["time"].split(" ")[0],
+            center=False,
+            heading_colour="purple",
+        )
         heading += "\n"
         heading += table.get_string()
         print(heading)
